@@ -1,6 +1,6 @@
 # Hosting multiple sites with traefik with SSL
 
-Template at : [https://github.com/alexiscotel/looking4flat](https://github.com/alexiscotel/docker-traefik-multisites)
+Template at : [github.com/alexiscotel/docker-traefik-multisites](https://github.com/alexiscotel/docker-traefik-multisites)
 
 ## commands
 ### start Traefik container
@@ -13,46 +13,45 @@ use for http & https
 docker-compose -f docker-compose.ssl.yml up -d
 ```
 ### start sites containers cluster
-next, for each sites you want to connect, add a `traefik` network to service that contains sources code
+For each sites you want to connect (site1, site2), add a __traefik__ network to service that contains sources code.<br>
+Add it 1st so traefik performs better
 ```
 networks:
-    - traefik #add 1st so traefik performs better
+    - traefik
 ```
 and add labels
 ```
 labels:
     - "traefik.enable=true"
     # http
-    - "traefik.http.routers.http_looking4flat.rule=Host(`looking4flat.com`)"
-    - "traefik.http.routers.http_looking4flat.entrypoints=http"
+    - "traefik.http.routers.http_site1_com.rule=Host(`site1.com`)"
+    - "traefik.http.routers.http_site1_com.entrypoints=http"
     # https
-    - "traefik.http.routers.https_looking4flat.rule=Host(`looking4flat.com`)"
-    - "traefik.http.routers.https_looking4flat.entrypoints=https"
-    - "traefik.http.routers.https_looking4flat.tls=true"
-    - "traefik.http.routers.https_looking4flat.tls.certresolver=myresolver"
+    - "traefik.http.routers.https_site1_com.rule=Host(`site1.com`)"
+    - "traefik.http.routers.https_site1_com.entrypoints=https"
+    - "traefik.http.routers.https_site1_com.tls=true"
+    - "traefik.http.routers.https_site1_com.tls.certresolver=myresolver"
 ```
 
 ## Information
-* Change email in `traefik/docker-compose.ssl.yml` line 14
+* Change email in `docker-compose.ssl.yml` line 14
 * Create file `acme.json` then change permission `chmod 600 acme.json` (use file properties for windows)
 
 Don't forget to edit hosts file in dev mode
 ```
 127.0.0.1 site1.com
-127.0.0.1 site2.com
 ```
 
-## Websites access
+## Website access
 
-the websites are accessible at the addresses
+the website are accessible at the addresses
 ```
 https://site1.com
-https://site2.com
 ```
-Don't forget to add the `traefik` network in networks sections
+Don't forget to add the __traefik__ network in networks sections
 ```
 networks:
-    # containers networks
+    # other containers networks
     traefik:
         name: traefik_global
 ```
