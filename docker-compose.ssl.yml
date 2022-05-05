@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+
+    traefik:
+        container_name: docker_traefik
+        image: traefik:v2.3
+        command:
+            - "--api.insecure=true"
+            - "--providers.docker"
+            - "--providers.docker.exposedbydefault=false"
+            - "--providers.docker.network=traefik_global"
+            - "--entrypoints.http.address=:80"
+            - "--entrypoints.https.address=:443"
+            - "--certificatesresolvers.myresolver.acme.email=your-personal@email.tld" # change email
+            - "--certificatesresolvers.myresolver.acme.storage=/acme.json" # it does need to exists but can be empty
+            - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+
+        ports:
+            - "80:80"     #reverse proxy => input to all containerized services
+            - "443:443"   #reverse ssl proxy
+            - "8080:8080" #traefik dashboard/api
+        volumes: #this is how traefik reads docker events
+            - /var/run/docker.sock:/var/run/docker.sock
+            # Run this command in the host machine before launching traefik: $ touch acme.json && chmod 600 acme.json
+            - ${PWD}/acme.json:/acme.json
+        networks:
+            - traefik
+
+networks:
+    traefik:
+        name: traefik_global
