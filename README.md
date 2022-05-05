@@ -1,9 +1,15 @@
 # Hosting multiple sites with traefik with SSL
 
-Template at : [github.com/alexiscotel/docker-traefik-multisites](https://github.com/alexiscotel/docker-traefik-multisites)
+## Template
+[github.com/alexiscotel/docker-traefik-multisites](https://github.com/alexiscotel/docker-traefik-multisites)
 
-## commands
-### start Traefik container
+## Information
+* Change email in `docker-compose.ssl.yml` line 14
+* Create file `acme.json` then change permission `chmod 600 acme.json` (use file properties for windows)
+
+<br>
+
+## start Traefik container
 use for http
 ```
 docker-compose -f docker-compose.yml up -d
@@ -12,7 +18,7 @@ use for http & https
 ```
 docker-compose -f docker-compose.ssl.yml up -d
 ```
-### start sites containers cluster
+## start sites containers cluster
 For each sites you want to connect (site1, site2), add a __traefik__ network to service that contains sources code.<br>
 Add it 1st so traefik performs better
 ```
@@ -32,14 +38,12 @@ labels:
     - "traefik.http.routers.https_site1_com.tls=true"
     - "traefik.http.routers.https_site1_com.tls.certresolver=myresolver"
 ```
-
-## Information
-* Change email in `docker-compose.ssl.yml` line 14
-* Create file `acme.json` then change permission `chmod 600 acme.json` (use file properties for windows)
-
-Don't forget to edit hosts file in dev mode
+Don't forget to add the __traefik__ network in networks sections
 ```
-127.0.0.1 site1.com
+networks:
+    # other containers networks
+    traefik:
+        name: traefik_global
 ```
 
 ## Website access
@@ -48,12 +52,9 @@ the website are accessible at the addresses
 ```
 https://site1.com
 ```
-Don't forget to add the __traefik__ network in networks sections
+Don't forget to edit hosts file in dev mode
 ```
-networks:
-    # other containers networks
-    traefik:
-        name: traefik_global
+127.0.0.1 site1.com
 ```
 
 ## Javier Lopez tutorials
